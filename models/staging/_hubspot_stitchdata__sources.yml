@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: hubspot_dp
+    database: datapilot-datadrivenmarketing
+    schema: hubspot_dp
+    tables:
+      - name: Emails
+      

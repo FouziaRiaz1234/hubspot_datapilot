@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: hubspot_tables
+    database: datapilot-datadrivenmarketing
+    schema: hubspot_tables  
+    tables:
+      - name: campaigns_table
+      - name: contacts_table
+      - name: contacts_list_table
+      - name: contacts_list_memberships_table
+      - name: marketing_email_table
+      - name: all_events_table
+      - name: click_event_table
+      - name: open_event_table
