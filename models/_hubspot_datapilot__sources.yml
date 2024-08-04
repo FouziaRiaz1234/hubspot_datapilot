@@ -13,3 +13,6 @@ sources:
       - name: all_events_table
       - name: click_event_table
       - name: open_event_table
+      - name: delivered_event_table
+      - name: bounce_event_table
+      - name: status_change_event_table
