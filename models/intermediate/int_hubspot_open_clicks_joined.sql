@@ -1,9 +1,4 @@
--- models/joined_email_events.sql
-{{
-    config(
-        materialized='table'
-    )
-}}
+
 
 WITH all_email_events AS (
   SELECT *
