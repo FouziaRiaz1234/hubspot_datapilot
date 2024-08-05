@@ -43,5 +43,8 @@ models:
       materialized: view
     staging:
       materialized: view
+    intermediates:
+      materialized: view
     marts:
-      materialized: table
+      materialized: view
+      

@@ -1,11 +1,4 @@
 
-{{
-    config(
-        materialized='table'
-    )
-}}
-
-
 WITH emails AS (
   SELECT
     *
