@@ -1,99 +1,59 @@
-{{
-    config(
-        materialized='table'
-    )
-}}
-
-WITH marketing_campaign_emails AS (
-  SELECT
-    *
-  FROM {{ ref('int_hubspot_marketing_campaign_emails_joined') }}
+WITH all_email_events AS (
+  SELECT *
+  FROM {{ ref('int_hubspot_campaign_emails_events') }}
 ),
 
-all_email_events AS (
-  SELECT
-    *
-  FROM {{ ref('int_hubspot_delivered_open_click_bounce_statuschange_emails') }}
+contacts_lists AS (
+  SELECT DISTINCT
+    contact_id,
+    static_list_id,
+    list_size,
+    list_name,
+    full_name,
+    email,
+    annual_revenue,
+    industry,
+    company_size,
+    job_title,
+    country AS contact_country,
+    state AS contact_state,
+    city AS contact_city
+  FROM {{ ref('int_contact_list_joined') }}
 ),
 
-combined_events AS (
-  SELECT 
-    i.email_id,
-    i.author,
-    i.from_name,
-    i.authorName,
-    i.campaign_name,
-    i.published_at,
-    i.contentTypeCategory,
-    i.currentState,
-    i.mailingListsExcluded,
-    i.mailingListsIncluded,
-    i.vidsIncluded,
-    i.content_id,
-    i.campaign_subject,
-    i.campaign_type,
-    i.campaign_id,
-    t.event_id,
-    t.device_type,
-    t.event_type,
-    t.sentby_created,
-    t.category,
-    t.recipient,
-    t.country,
-    t.state,
-    t.city,
-    t.sentby_id,
-    t.open_duration
-  FROM 
-    marketing_campaign_emails i
-  LEFT JOIN 
-    all_email_events t
-  ON 
-    i.campaign_id = t.campaign_id
+combined_data AS (
+  SELECT
+    c.contact_id,
+    c.static_list_id,
+    c.list_size,
+    c.list_name,
+    c.full_name,
+    c.email,
+    c.annual_revenue,
+    c.industry,
+    c.company_size,
+    c.job_title,
+    a.event_type,
+    a.recipient,
+    a.campaign_id,
+    a.campaign_name,
+    a.from_name,
+    a.campaign_type,
+    a.campaign_subject,
+    a.sentby_created,
+    a.category,
+    COALESCE(a.country, c.contact_country) AS country,
+    COALESCE(a.state, c.contact_state) AS state,
+    COALESCE(a.city, c.contact_city) AS city,
+    ROW_NUMBER() OVER (
+      PARTITION BY c.contact_id, c.static_list_id, c.list_size, c.list_name, c.full_name, c.email, c.annual_revenue, c.industry, c.company_size, c.job_title, a.event_type, a.recipient, a.campaign_id, a.campaign_name, a.from_name, a.campaign_type, a.campaign_subject, a.sentby_created, a.category
+      ORDER BY COALESCE(a.country, c.contact_country), COALESCE(a.state, c.contact_state), COALESCE(a.city, c.contact_city)
+    ) AS rn
+  FROM contacts_lists c
+  LEFT JOIN all_email_events a
+  ON c.email = a.recipient
 )
 
-SELECT 
-  event_type,
-  recipient,
-  sentby_created,
-  published_at,
-  country,
-  state,
-  city,
-  author,
-  from_name,
-  authorName,
-  campaign_id,
-  campaign_name,
-  campaign_subject,
-  campaign_type,
-  email_id,
-  category,
-  MAX(contentTypeCategory) AS contentTypeCategory,
-  MAX(currentState) AS currentState,
-  MAX(mailingListsExcluded) AS mailingListsExcluded,
-  MAX(mailingListsIncluded) AS mailingListsIncluded,
-  MAX(vidsIncluded) AS vidsIncluded,
-  MAX(sentby_id) AS sentby_id,
-  MAX(open_duration) AS open_duration
-FROM 
-  combined_events
-GROUP BY 
-  event_id,
-  event_type,
-  recipient,
-  sentby_created,
-  country,
-  state,
-  city,
-  author,
-  from_name,
-  authorName,
-  campaign_id,
-  campaign_name,
-  campaign_subject,
-  campaign_type,
-  email_id,
-  published_at,
-  category
-  
+SELECT *
+FROM combined_data
+WHERE rn = 1

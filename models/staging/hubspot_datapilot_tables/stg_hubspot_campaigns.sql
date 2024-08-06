@@ -1,6 +1,6 @@
 WITH source_data AS
 (
-    SELECT
+    SELECT DISTINCT
     CAST(campaign_id AS STRING) AS campaign_id,
     content_id,	
     subject	AS campaign_subject,

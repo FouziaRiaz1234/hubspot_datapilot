@@ -23,9 +23,9 @@ click_events AS (
     CAST(NULL AS STRING) AS category,
     event_type,
     recipient,
-    country,
-    state,
-    city,
+    NULLIF(country, 'Unknown') AS country,
+    NULLIF(state, 'Unknown') AS state,
+    NULLIF(city, 'Unknown') AS city,
     device_type,
     sentby_id,
     sentby_created,
@@ -40,9 +40,9 @@ open_events AS (
     CAST(NULL AS STRING) AS category,
     event_type,
     recipient,
-    country,
-    state,
-    city,
+    NULLIF(country, 'Unknown') AS country,
+    NULLIF(state, 'Unknown') AS state,
+    NULLIF(city, 'Unknown') AS city,
     device_type,
     sentby_id,
     sentby_created,
@@ -101,6 +101,23 @@ status_change_events AS (
   FROM {{ ref('stg_hubspot_status_change_event') }}
 ),
 
+sent_events AS (
+  SELECT
+    event_id,
+    campaign_id,
+    CAST(NULL AS STRING) AS category,
+    event_type,
+    recipient,
+    CAST(NULL AS STRING) country,
+    CAST(NULL AS STRING) state,
+    CAST(NULL AS STRING) city,
+    CAST(NULL AS STRING) device_type,
+    sentby_id,
+    sentby_created,
+    CAST(NULL AS STRING) open_duration
+  FROM {{ ref('stg_hubspot_sent_event') }}
+),
+
 combined_events AS (
   SELECT * FROM all_email_events
   UNION ALL
@@ -113,6 +130,8 @@ combined_events AS (
   SELECT * FROM bounce_events
   UNION ALL
   SELECT * FROM status_change_events
+  UNION ALL
+  SELECT * FROM sent_events
 )
 
 SELECT

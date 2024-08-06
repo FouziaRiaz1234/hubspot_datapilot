@@ -1,19 +1,18 @@
-
 WITH emails AS (
   SELECT
     *
   FROM {{ ref('stg_hubspot_marketing_emails') }}
 ),
 
-
 campaigns AS (
   SELECT
-     *
+    *
   FROM {{ ref('stg_hubspot_campaigns') }}
 )
 
 SELECT DISTINCT
   e.email_id,
+  e.email_name,
   e.author,
   e.from_name,
   e.authorName,
@@ -28,7 +27,7 @@ SELECT DISTINCT
   c.campaign_subject,
   c.campaign_type,
   c.campaign_id
-  
-FROM campaigns c
-INNER JOIN emails e
-ON CAST(e.campaign_id AS STRING) = CAST(c.campaign_id AS STRING)
+FROM emails e
+LEFT JOIN campaigns c
+ON e.email_name = c.campaign_name
+

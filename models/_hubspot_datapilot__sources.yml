@@ -17,4 +17,5 @@ sources:
       - name: bounce_event_table
       - name: status_change_event_table
       - name: replica_contacts_table
+      - name: sent_event_table
       
