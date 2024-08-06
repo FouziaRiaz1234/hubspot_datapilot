@@ -10,6 +10,6 @@ WITH source_data AS
     sentBy_created,
     category
   FROM {{ source('hubspot_tables', 'all_events_table') }}
-  WHERE type IN ('OPEN' , 'CLICK', 'DELIVERED', 'BOUNCE', 'STATUSCHANGE'))
+  WHERE type IN ('OPEN' , 'CLICK', 'DELIVERED', 'BOUNCE', 'STATUSCHANGE', 'SENT'))
 
 SELECT * FROM source_data

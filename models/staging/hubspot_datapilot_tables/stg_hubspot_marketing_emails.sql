@@ -29,14 +29,12 @@ WITH emails AS (
     emailCampaignGroupId,
     campaign,
     campaignName,
-    campaignUtm,
-    SPLIT(REPLACE(REPLACE(allEmailCampaignIds, '[', ''), ']', ''), ',') AS allEmailCampaignIds_array
+    campaignUtm
   FROM {{ source('hubspot_tables', 'marketing_email_table') }}
 )
 
 SELECT
     email_id,
-    SAFE_CAST(TRIM(campaign_id) AS INT64) AS campaign_id,
     email_name,
     email_type,
     subcategory,
@@ -59,7 +57,6 @@ SELECT
     campaign,
     campaignName,
     campaignUtm,
-FROM emails, UNNEST(allEmailCampaignIds_array) AS campaign_id
-WHERE SAFE_CAST(TRIM(campaign_id) AS INT64) IS NOT NULL
-AND from_name IN ('Data Pilot', 'Hamza Malik', 'Tooba Shah')
+FROM emails
+WHERE from_name IN ('Data Pilot', 'Hamza Malik', 'Tooba Shah')
 

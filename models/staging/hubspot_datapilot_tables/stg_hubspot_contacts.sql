@@ -5,6 +5,7 @@ WITH source_data AS
     CONCAT(properties_firstname, ' ', properties_lastname) AS full_name,
     properties_createdate AS created_at,
     properties_annualrevenue AS annual_revenue,
+    properties_hs_marketable_status AS marketing_contact_status,
     properties_country AS country,
     properties_state AS state,
     properties_city AS city,
